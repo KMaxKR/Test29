@@ -5,6 +5,8 @@ package databaseConfig;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class DBHandler extends Config{
     Connection dbconnection;
@@ -14,8 +16,8 @@ public class DBHandler extends Config{
         return dbconnection;
     }
 
-    public List<Cars> getDbValues(String value) throws SQLException {
-        String getValues = "SELECT " + value + " FROM " + Const.USER_TABLE;
+    public List<Cars> getDbValues() throws SQLException {
+        String getValues = "SELECT * FROM " + Const.USER_TABLE;
         PreparedStatement prSt = dbconnection.prepareStatement(getValues);
         ResultSet resultSet = prSt.executeQuery();
         List<Cars> list =  new ArrayList<>();
@@ -43,6 +45,21 @@ public class DBHandler extends Config{
         }catch (Exception e){
             e.getStackTrace();
         }
+    }
+    public List<Cars> selectWithCondition(String condition) throws SQLException {
+        List<Cars> list = new ArrayList<>();
+        String query = "SELECT * FROM " + Const.USER_TABLE + " WHERE " + condition;
+        PreparedStatement prSt = dbconnection.prepareStatement(query);
+        ResultSet resultSet = prSt.executeQuery();
+        while(resultSet.next()){
+            int id = resultSet.getInt(1);
+            String car_name = resultSet.getString(2);
+            int hp = resultSet.getInt(3);
+            double price = resultSet.getDouble(4);
+            list.add(new Cars(id, car_name, hp, price));
+        }
+        prSt.close();
+        return list;
     }
 
 }
